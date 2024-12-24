@@ -65,7 +65,6 @@ export default function Employees() {
   // Définition des colonnes de la table
   console.log(employees)
   const columns = [
-
     { 
       key: 'fullName',
       label: 'Nom',
@@ -74,13 +73,16 @@ export default function Employees() {
     { key: 'email', label: 'Email', render: (_: any, employee: Employee) => employee.email },
     { key: 'department', label: 'Département', render: (_: any, employee: Employee) => employee.departement },
     { key: 'position', label: 'Poste', render: (_: any, employee: Employee) => employee.poste },
+    { key: 'salaire', label: 'Salaire',  render: (_: any, employee: Employee) => employee.salaire},
+    { key: 'type_contrat', label: 'Contrat',  render: (_: any, employee: Employee) => employee.contrat},
+
     {
       key: 'status',
       label: 'Statut',
-      render: (status: string) => (
+      render: (_: any, employee: Employee) => (
         <StatusBadge
-          status={status === 'Actif' ? 'success' : 'error'}  // Statut 'Actif' ou 'Inactif'
-          text={status === 'Actif' ? 'Actif' : 'Inactif'}
+          status={employee.statut === 'Actif' ? 'success' : 'error'}  // Statut 'Actif' ou 'Inactif'
+          text={employee.statut === 'Actif' ? 'Actif' : 'Inactif'}
         />
       ),
     },

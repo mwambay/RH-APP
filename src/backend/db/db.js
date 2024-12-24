@@ -31,7 +31,9 @@ export async function recupererEmploye() {
         employees.email, 
         departments.name AS department_name, 
         employees.contract_type, 
-        employees.status
+        employees.status,
+        employees.salary,
+        employees.poste
       FROM 
         employees
       INNER JOIN 

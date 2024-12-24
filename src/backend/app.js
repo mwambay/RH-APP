@@ -34,14 +34,15 @@ const startServer = async () => {
       if (employes.length === 0) {
         return res.status(404).json({ message: 'Aucun employé trouvé' });
       }
-  
       // Formater les données à renvoyer
       const tableau = employes.map(employe => ({
         nom: employe.first_name,
         email: employe.email,
         departement: employe.department_name,
-        poste: employe.contract_type,
-        statut: employe.status
+        poste: employe.poste,
+        statut: employe.status,
+        salaire: employe.salary,
+        contrat: employe.contract_type
       }));
       console.log(tableau);
       // Renvoi des données formatées
