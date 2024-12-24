@@ -68,7 +68,7 @@ export default function Employees() {
     { 
       key: 'fullName',
       label: 'Nom',
-      render: (_: any, employee: Employee) => `${employee.nom}`  // Affichage du nom de l'employé
+      render: (_: any, employee: Employee) => `${employee.nom + " " + employee.lastName}`  // Affichage du nom de l'employé
     },
     { key: 'email', label: 'Email', render: (_: any, employee: Employee) => employee.email },
     { key: 'department', label: 'Département', render: (_: any, employee: Employee) => employee.departement },

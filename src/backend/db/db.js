@@ -28,6 +28,7 @@ export async function recupererEmploye() {
     const recupererEmployeQuery = `
       SELECT 
         employees.first_name, 
+        employees.last_name,
         employees.email, 
         departments.name AS department_name, 
         employees.contract_type, 
@@ -132,8 +133,8 @@ export async function insertEmployee(data) {
       // Insérez l'employé
       const insertQuery = `
         INSERT INTO employees (
-          first_name, last_name, email, department_id, position_id, salary
-        ) VALUES ($1, $2, $3, $4, $5, $6)
+          first_name, last_name, email, department_id, position_id, salary, contract_type, poste
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id
       `;
       const values = [
@@ -143,6 +144,8 @@ export async function insertEmployee(data) {
         departmentId,
         positionId,
         data.salary,
+        data.contrat,
+        data.position
       ];
   
       const result = await pool.query(insertQuery, values);

@@ -7,6 +7,7 @@ export interface Employee {
   department: string;
   hireDate: string;
   salary: number;
+  contrat: string;
 }
 
 export interface Leave {
@@ -17,6 +18,7 @@ export interface Leave {
   type: 'vacation' | 'sick' | 'other';
   status: 'pending' | 'approved' | 'rejected';
   reason: string;
+
 }
 
 export interface Attendance {

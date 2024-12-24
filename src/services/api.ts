@@ -13,16 +13,16 @@ const postRequest = async (endpoint: string, parameter: object): Promise<Backend
 export const api = {
 
   getDashBordInfo: async (parameter = {hey:'hey express server'}): Promise<BackendResponse> => {
-    const response = await axios.post(`${API_URL}/dashbord-info?file`, parameter);
+    const response = await axios.post(`${API_URL}/dashboard/info?file`, parameter);
     return response.data;
   },
 
   addEmployee: async (Employee : object): Promise<BackendResponse> => {
-    const response = await axios.post(`${API_URL}/add-employees`, Employee);
+    const response = await axios.post(`${API_URL}/employees/add`, Employee);
     return response.data;
   },
   getEmployeInfo: (parameter = { hey: 'hey express server' }): Promise<BackendResponse> => {
-    return postRequest('employe-info?file', parameter);
+    return postRequest('employees/get?file', parameter);
   },
 
   getDepartements: async (): Promise<BackendResponse> => {

@@ -36,7 +36,9 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
       email: formData.get('email') as string,
       position: formData.get('position') as string,
       department: formData.get('department') as string,
+      contrat: formData.get('contrat') as string,
       salary: Number(formData.get('salary')),
+      
       
     };
     //onSubmit(data);
@@ -87,18 +89,18 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Département</label>
+        <label className="block text-sm font-medium text-gray-700">Contrat</label>
         <select
           name="contrat"
-          defaultValue={employee?.department}
+          defaultValue={employee?.contrat}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         >
-          <option value="">Sélectionner le type de contrat</option>
-          <option value="IT">IT</option>
-          <option value="RH">RH</option>
-          <option value="Finance">Finance</option>
-          <option value="Marketing">Marketing</option>
+            <option value="">Sélectionner le type de contrat</option>
+            <option value="CDI">CDI</option>
+            <option value="CDD">CDD</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Stage">Stage</option>
         </select>
       </div>
 
