@@ -89,8 +89,6 @@ export async function getDepartement() {
   
 }
 
-
-
 // Fonction pour insérer un employé
 export async function insertEmployee(data) {
     try {
@@ -165,7 +163,6 @@ export async function insertEmployee(data) {
     salary: 3000,
   };
   
-
 
 // Exporter la connexion
 export default pool;

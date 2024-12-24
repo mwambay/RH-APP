@@ -3,12 +3,25 @@ import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { api } from '../services/api';
 
 export default function Dashboard() {
+  
   const [isLoading, setIsLoading] = React.useState(false);
   const [duree, setDuree] = React.useState(0)
   const [nombreEmploye, setNombreEmploye] = React.useState(0)
   const [congesAttente, setCongesAttente] = React.useState(0)
   const [tauxPresence, setTauxPresence] = React.useState(0)
   const [presents, setPresents] = React.useState(0)
+
+  const fetchDashboardInfo = async () => {
+    const response = await api.getDashBordInfo();
+    setNombreEmploye(response.employe)
+    setCongesAttente(response.conges)
+    setPresents(response.present)
+    setTauxPresence(response.taux)
+  }
+  React.useEffect(() => {
+    fetchDashboardInfo();
+  }, []);
+
 
   const handleStartBot = async () => {
     setIsLoading(true);
