@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Edit, Trash2, UserPlus } from 'lucide-react';
 import PageHeader from '../components/common/PageHeader';
 import DataTable from '../components/common/DataTable';
@@ -6,34 +6,44 @@ import StatusBadge from '../components/common/StatusBadge';
 import Modal from '../components/common/Modal';
 import EmployeeForm from '../components/employees/EmployeeForm';
 import { Employee } from '../types';
+import { api } from '../services/api';
 
 export default function Employees() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);  // Initialisation de l'état pour les employés
+  const [isLoading, setIsLoading] = useState(true); // Pour gérer le chargement des données
+  const [error, setError] = useState<string | null>(null); // Pour gérer les erreurs
 
-  const employees = [
-    {
-      id: '1',
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      email: 'jean.dupont@example.com',
-      department: 'IT',
-      position: 'Développeur Senior',
-      status: 'active',
-      salary: 45000,
-    },
-    {
-      id: '2',
-      firstName: 'Marie',
-      lastName: 'Martin',
-      email: 'marie.martin@example.com',
-      department: 'RH',
-      position: 'Responsable RH',
-      status: 'active',
-      salary: 48000,
-    },
-  ];
+  // Fonction pour récupérer les employés via l'API
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.getEmployeInfo(); // Appel de l'API
+      console.log('Réponse de l\'API:', response);  // Vérification de la réponse
+  
+      // Vérification si les données sont présentes et contiennent des employés
+      if (Array.isArray(response.data)) {
+        if (response.data.length > 0) {
+          setEmployees(response.data);  // Mise à jour de l'état avec les employés
+        } else {
+          setError('Aucun employé trouvé');  // Message d'erreur si aucun employé n'est trouvé
+        }
+      } else {
+        setError('Les données des employés sont mal formatées.');  // Affichage d'une erreur détaillée
+      }
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des employés:', error);
+      setError('Erreur lors de la récupération des employés');  // Affichage d'une erreur générique
+    } finally {
+      setIsLoading(false);  // Fin du chargement, qu'il y ait ou non une erreur
+    }
+  };
+  
+  // Utilisation de useEffect pour charger les données au montage du composant
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const handleAddEmployee = (data: Partial<Employee>) => {
     console.log('Nouvel employé:', data);
@@ -52,22 +62,23 @@ export default function Employees() {
     }
   };
 
+  // Définition des colonnes de la table
   const columns = [
     { 
       key: 'fullName',
       label: 'Nom',
-      render: (_, employee: Employee) => `${employee.firstName} ${employee.lastName}`
+      render: (_: any, employee: Employee) => `${employee.nom}`  // Affichage du nom de l'employé
     },
-    { key: 'email', label: 'Email' },
-    { key: 'department', label: 'Département' },
-    { key: 'position', label: 'Poste' },
+    { key: 'email', label: 'Email', render: (_: any, employee: Employee) => employee.email },
+    { key: 'department', label: 'Département', render: (_: any, employee: Employee) => employee.departement },
+    { key: 'position', label: 'Poste', render: (_: any, employee: Employee) => employee.poste },
     {
       key: 'status',
       label: 'Statut',
       render: (status: string) => (
         <StatusBadge
-          status={status === 'active' ? 'success' : 'error'}
-          text={status === 'active' ? 'Actif' : 'Inactif'}
+          status={status === 'Actif' ? 'success' : 'error'}  // Statut 'Actif' ou 'Inactif'
+          text={status === 'Actif' ? 'Actif' : 'Inactif'}
         />
       ),
     },
@@ -110,11 +121,17 @@ export default function Employees() {
       </div>
 
       <div className="mt-6">
-        <DataTable
-          columns={columns}
-          data={employees}
-          actions={actions}
-        />
+        {isLoading ? (
+          <p>Chargement des données...</p>  // Affichage d'un message de chargement
+        ) : error ? (
+          <p className="text-red-500">{error}</p>  // Affichage de l'erreur s'il y en a
+        ) : (
+          <DataTable
+            columns={columns}
+            data={employees}  // Utilisation des données récupérées de l'API
+            actions={actions}
+          />
+        )}
       </div>
 
       <Modal

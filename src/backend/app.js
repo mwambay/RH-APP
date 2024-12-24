@@ -1,44 +1,60 @@
 import express from 'express';
 import cors from 'cors';
-import pool from './db/db.js';
+import { totalEmploye, recupererEmploye } from './db/db.js';
+
 const app = express();
 app.use(cors()); // activer CORS
 app.use(express.json()); //parser les requêtes JSON
 
-app.listen(3000, () => console.log('Server is running...'));
-let count = 0;
+// Fonction asynchrone pour démarrer le serveur
+const startServer = async () => {
+  const total = await totalEmploye(); // Attendre le résultat de totalEmploye()
 
-app.post('/dashbord-info', (req, res) => {
-    count++;
-    const dashbord = {'present' : count, 'taux' : count / 100, 'conges' : count * 9, 'employe' : count + 9}
-    console.log('Received request on /hey');
-    console.log(req.body)
+  const employes = await recupererEmploye(); // Attendre le résultat de recupererEmploye()
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
+
+  app.post('/dashbord-info', (req, res) => {
+    const dashbord = {
+      'present': total,
+      'taux': total / 100,
+      'conges': total * 9,
+      'employe': total
+    };
+    console.log('Received request on /dashbord-info');
+    console.log(req.body);
     res.json(dashbord);
-});
+  });
 
-
-// Route pour créer une table
-async function  createTable() {
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+  app.post('/employe-info', async (req, res) => {
     try {
-      await pool.query(createTableQuery);
-      console.log('Table "users" créée avec succès.');
-    } catch (err) {
-      console.error(err.message);
-      console.log('Erreur lors de la création de la table.');
+      const employes = await recupererEmploye();  // Appel à la fonction pour récupérer les employés
+  
+      if (employes.length === 0) {
+        return res.status(404).json({ message: 'Aucun employé trouvé' });
+      }
+  
+      // Formater les données à renvoyer
+      const tableau = employes.map(employe => ({
+        nom: employe.nom,
+        email: employe.email,
+        departement: employe.departement,
+        poste: employe.poste,
+        statut: employe.statut
+      }));
+  
+      // Renvoi des données formatées
+      return res.status(200).json({ data: tableau });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des employés:', error);
+      return res.status(500).json({ message: 'Erreur interne du serveur' });
     }
-  };
-createTable();
+  });
+};
 
-
-
+// Démarrer le serveur
+startServer();
 
 // Exemple : Route pour récupérer des données
 app.get('/users', async (req, res) => {
@@ -65,4 +81,3 @@ app.post('/users', async (req, res) => {
     res.status(500).send('Erreur du serveur');
   }
 });
-

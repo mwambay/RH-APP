@@ -1,6 +1,6 @@
 import React from 'react';
 import { Employee } from '../../types';
-import { api } from '../services/api';
+import { api } from '../../services/api';
 
 interface EmployeeFormProps {
   employee?: Employee;
@@ -23,6 +23,8 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
       salary: Number(formData.get('salary')),
     };
     //console.log(data);
+    const response =  api.addEmployee(data);
+
     onSubmit(data);
   };
 
