@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { totalEmploye, recupererEmploye } from './db/db.js';
+import { totalEmploye, recupererEmploye, getDepartement, insertEmployee } from './db/db.js';
 
 const app = express();
 app.use(cors()); // activer CORS
@@ -37,13 +37,13 @@ const startServer = async () => {
   
       // Formater les données à renvoyer
       const tableau = employes.map(employe => ({
-        nom: employe.nom,
+        nom: employe.first_name,
         email: employe.email,
-        departement: employe.departement,
-        poste: employe.poste,
-        statut: employe.statut
+        departement: employe.department_name,
+        poste: employe.contract_type,
+        statut: employe.status
       }));
-  
+      console.log(tableau);
       // Renvoi des données formatées
       return res.status(200).json({ data: tableau });
     } catch (error) {
@@ -80,4 +80,23 @@ app.post('/users', async (req, res) => {
     console.error(err.message);
     res.status(500).send('Erreur du serveur');
   }
+});
+
+app.post('/add-employees', async (req, res) => {
+    console.log(req.body);
+    insertEmployee(req.body);
+});
+
+app.get('/departments', async (req, res) => {
+    const departement = await getDepartement();
+    // Formater les données à renvoyer
+    const tableau = departement.map(departement => ({
+      id: departement.id,
+      nom: departement.name,
+      description: departement.description
+    }));
+
+    // Renvoi des données formatées
+    return res.status(200).json({ data: tableau });
+
 });

@@ -61,9 +61,11 @@ export default function Employees() {
       console.log('Suppression employé:', employee);
     }
   };
-
+  console
   // Définition des colonnes de la table
+  console.log(employees)
   const columns = [
+
     { 
       key: 'fullName',
       label: 'Nom',

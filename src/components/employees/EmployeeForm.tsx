@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Employee } from '../../types';
 import { api } from '../../services/api';
 
@@ -9,8 +9,24 @@ interface EmployeeFormProps {
 }
 
 export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await api.getDepartements();
+        setDepartments(response.data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des départements:', error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  const handleSubmit  = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("kkkks")
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     
@@ -22,10 +38,15 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
       department: formData.get('department') as string,
       salary: Number(formData.get('salary')),
     };
-    //console.log(data);
-    const response =  api.addEmployee(data);
+    //onSubmit(data);
 
-    onSubmit(data);
+    //await api.addEmployee(data);
+    try {
+      api.addEmployee(data);
+      onSubmit(data);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'employé:', error);
+    }
   };
 
   return (
@@ -84,10 +105,11 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
           required
         >
           <option value="">Sélectionner un département</option>
-          <option value="IT">IT</option>
-          <option value="RH">RH</option>
-          <option value="Finance">Finance</option>
-          <option value="Marketing">Marketing</option>
+          {departments.map((dept) => (
+            <option key={dept.id} value={dept.nom}>
+              {dept.nom}
+            </option>
+          ))}
         </select>
       </div>
 

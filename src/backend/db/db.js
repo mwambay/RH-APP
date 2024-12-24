@@ -25,24 +25,35 @@ export async function totalEmploye() {
 }
 
 export async function recupererEmploye() {
-  const recupererEmployeQuery = `
-    SELECT first_name, email, department_id, contract_type, status
-    FROM employees;
-  `;
-  try {
-    const result = await pool.query(recupererEmployeQuery);
+    const recupererEmployeQuery = `
+      SELECT 
+        employees.first_name, 
+        employees.email, 
+        departments.name AS department_name, 
+        employees.contract_type, 
+        employees.status
+      FROM 
+        employees
+      INNER JOIN 
+        departments
+      ON 
+        employees.department_id = departments.id    `;
     
-    if (!result.rows || result.rows.length === 0) {
-      console.log('Aucun employé trouvé');
-      return []; // Retourner un tableau vide si aucune donnée n'est trouvée
+    try {
+      const result = await pool.query(recupererEmployeQuery);
+      
+      if (!result.rows || result.rows.length === 0) {
+        console.log('Aucun employé trouvé');
+        return []; // Retourner un tableau vide si aucune donnée n'est trouvée
+      }
+  
+      return result.rows;  // Retourner directement les résultats sous forme de tableau d'objets
+    } catch (err) {
+      console.error("Erreur lors de la récupération des données:", err.message);
+      throw new Error('Erreur lors de la récupération des employés.'); // Lancer une erreur générique à remonter
     }
-
-    return result.rows;  // Retourner directement les résultats sous forme de tableau d'objets
-  } catch (err) {
-    console.error("Erreur lors de la récupération des données:", err.message);
-    throw new Error('Erreur lors de la récupération des employés.'); // Lancer une erreur générique à remonter
   }
-}
+  
 
 
 
@@ -59,6 +70,96 @@ export async function totalPresent() {
   }
 }
 
+export async function getDepartement() {
+  const departementQuery = `
+   select * from departments;
+  `;
+  try {
+    const result = await pool.query(departementQuery);
+    return result.rows;
+
+  } catch (err) {
+    console.error(err.message);
+    console.log('Erreur lors de la récupération des données.');
+  }
+
+  
+}
+
+
+
+// Fonction pour insérer un employé
+export async function insertEmployee(data) {
+    try {
+      // Vérifiez si le département existe
+      const departmentResult = await pool.query(
+        'SELECT id FROM departments WHERE name = $1',
+        [data.department]
+      );
+  
+      let departmentId;
+      if (departmentResult.rows.length > 0) {
+        departmentId = departmentResult.rows[0].id;
+      } else {
+        // Créez le département si nécessaire
+        const newDepartment = await pool.query(
+          'INSERT INTO departments (name, description) VALUES ($1, $2) RETURNING id',
+          [data.department, 'Département ajouté automatiquement.']
+        );
+        departmentId = newDepartment.rows[0].id;
+      }
+  
+      // Vérifiez si le poste existe
+      const positionResult = await pool.query(
+        'SELECT id FROM positions WHERE name = $1',
+        [data.position]
+      );
+  
+      let positionId;
+      if (positionResult.rows.length > 0) {
+        positionId = positionResult.rows[0].id;
+      } else {
+        // Créez le poste si nécessaire
+        const newPosition = await pool.query(
+          'INSERT INTO positions (name, description) VALUES ($1, $2) RETURNING id',
+          [data.position, 'Poste ajouté automatiquement.']
+        );
+        positionId = newPosition.rows[0].id;
+      }
+  
+      // Insérez l'employé
+      const insertQuery = `
+        INSERT INTO employees (
+          first_name, last_name, email, department_id, position_id, salary
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+      `;
+      const values = [
+        data.firstName,
+        data.lastName,
+        data.email,
+        departmentId,
+        positionId,
+        data.salary,
+      ];
+  
+      const result = await pool.query(insertQuery, values);
+      console.log('Employé inséré avec succès, ID :', result.rows[0].id);
+    } catch (err) {
+      console.error('Erreur lors de l\'insertion de l\'employé :', err);
+    }
+  }
+  
+  // Exemple de données
+  const newEmployee = {
+    firstName: 'Sagesse',
+    lastName: 'Mkj',
+    email: 'alain@kab',
+    position: 'pour',
+    department: 'Ressources Humaines',
+    salary: 3000,
+  };
+  
 
 
 // Exporter la connexion
