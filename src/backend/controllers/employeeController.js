@@ -1,4 +1,16 @@
-import { totalEmploye, recupererEmploye, getDepartement, insertEmployee } from '../db/db.js';
+import { totalEmploye, recupererEmploye, deleteEmployee, insertEmployee } from '../db/db.js';
+
+export const delEmployee = async (req, res) => {
+  try{
+    const id = Number(req.body.id)
+    await deleteEmployee(id)
+    return res.status(200).json({del : true});
+  }
+  catch(error){
+    console.log(error);
+    return res.status(404).json({message: 'echec de la supression'})
+  }
+}
 
 
 export const getEmployees = async (req, res) => {
@@ -8,6 +20,7 @@ export const getEmployees = async (req, res) => {
         return res.status(404).json({ message: 'Aucun employé trouvé' });
       }
       const tableau = employes.map(employe => ({
+        id: employe.id,
         nom: employe.first_name,
         email: employe.email,
         departement: employe.department_name,

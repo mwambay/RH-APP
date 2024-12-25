@@ -28,6 +28,12 @@ export const api = {
   getDepartements: async (): Promise<BackendResponse> => {
     const response = await axios.get(`${API_URL}/departments?file`);
     return response.data;
+  },
+
+  deleteEmploye : async (parameter : object): Promise<BackendResponse> => {
+    console.log("hhh", parameter);
+    const response = axios.post(`${API_URL}/employees/delete`, parameter);
+    return response;
   }
 
 };

@@ -27,6 +27,7 @@ export async function totalEmploye() {
 export async function recupererEmploye() {
     const recupererEmployeQuery = `
       SELECT 
+        employees.id,
         employees.first_name, 
         employees.last_name,
         employees.email, 
@@ -70,6 +71,26 @@ export async function totalPresent() {
   } catch (err) {
     console.error(err.message);
     console.log('Erreur lors de la récupération des données.');
+  }
+}
+
+export async function deleteEmployee(id) {
+  const delQuery = `
+    DELETE FROM employees
+    WHERE id = $1
+    RETURNING *
+  `;
+  try {
+    const result = await pool.query(delQuery, [id]);
+    if (result.rowCount === 0) {
+      console.log('Aucun employé trouvé avec cet ID.');
+      return null;
+    }
+    console.log('Employé supprimé avec succès, ID :', result.rows[0].id);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur lors de la suppression de l\'employé :', err.message);
+    throw new Error('Erreur lors de la suppression de l\'employé.');
   }
 }
 
@@ -152,16 +173,6 @@ export async function insertEmployee(data) {
       console.error('Erreur lors de l\'insertion de l\'employé :', err);
     }
   }
-  
-  // Exemple de données
-  const newEmployee = {
-    firstName: 'Sagesse',
-    lastName: 'Mkj',
-    email: 'alain@kab',
-    position: 'pour',
-    department: 'Ressources Humaines',
-    salary: 3000,
-  };
   
 
 // Exporter la connexion

@@ -56,9 +56,13 @@ export default function Employees() {
     setSelectedEmployee(null);
   };
 
-  const handleDeleteEmployee = (employee: Employee) => {
+  const handleDeleteEmployee = async (employee: Employee) => {
+
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
-      console.log('Suppression employé:', employee);
+      //console.log('Suppression employé:', employee.firstName);
+      const res = await api.deleteEmploye({id: employee.id});
+      console.log(res);
+      fetchEmployees();  // Recharger les employés après la suppression
     }
   };
   console
