@@ -31,17 +31,25 @@ export async function recupererEmploye() {
         employees.first_name, 
         employees.last_name,
         employees.email, 
+        employees.department_id,
         departments.name AS department_name, 
         employees.contract_type, 
         employees.status,
         employees.salary,
-        employees.poste
+        employees.position_id,
+        positions.name AS poste
       FROM 
         employees
       INNER JOIN 
         departments
       ON 
-        employees.department_id = departments.id    `;
+        employees.department_id = departments.id    
+        
+    INNER JOIN 
+      positions
+    ON 
+      employees.position_id = positions.id
+      `;
     
     try {
       const result = await pool.query(recupererEmployeQuery);
@@ -73,6 +81,85 @@ export async function totalPresent() {
     console.log('Erreur lors de la récupération des données.');
   }
 }
+
+export async function updateEmp(id, data) {
+  console.log(typeof(id), id, data, "hello")
+  const updateQuery = `
+    UPDATE employees
+    SET 
+      first_name = $1,
+      last_name = $2,
+      email = $3,
+      department_id = $4,
+      position_id = $5,
+      salary = $6,
+      contract_type = $7
+    WHERE id = $8
+    RETURNING *
+  `;
+
+  try {
+    // Vérifiez si le département existe
+    const departmentResult = await pool.query(
+      'SELECT id FROM departments WHERE name = $1',
+      [data.department]
+    );
+
+    let departmentId;
+    if (departmentResult.rows.length > 0) {
+      departmentId = departmentResult.rows[0].id;
+    } else {
+      // Créez le département si nécessaire
+      const newDepartment = await pool.query(
+        'INSERT INTO departments (name, description) VALUES ($1, $2) RETURNING id',
+        [data.department, 'Département ajouté automatiquement.']
+      );
+      departmentId = newDepartment.rows[0].id;
+    }
+
+    // Vérifiez si le poste existe
+    const positionResult = await pool.query(
+      'SELECT id FROM positions WHERE name = $1',
+      [data.position]
+    );
+
+    let positionId;
+    if (positionResult.rows.length > 0) {
+      positionId = positionResult.rows[0].id;
+    } else {
+      // Créez le poste si nécessaire
+      const newPosition = await pool.query(
+        'INSERT INTO positions (name, description) VALUES ($1, $2) RETURNING id',
+        [data.position, 'Poste ajouté automatiquement.']
+      );
+      positionId = newPosition.rows[0].id;
+    }
+
+    const values = [
+      data.firstName,
+      data.lastName,
+      data.email,
+      departmentId,
+      positionId,
+      data.salary,
+      data.contrat,
+      id
+    ];
+
+    const result = await pool.query(updateQuery, values);
+    if (result.rowCount === 0) {
+      console.log('Aucun employé trouvé avec cet ID.');
+      return null;
+    }
+    console.log('Employé mis à jour avec succès, ID :', result.rows[0].id);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Erreur lors de la mise à jour de l\'employé :', err.message);
+    throw new Error('Erreur lors de la mise à jour de l\'employé.');
+  }
+}
+
+
 
 export async function deleteEmployee(id) {
   const delQuery = `
@@ -152,8 +239,8 @@ export async function insertEmployee(data) {
       // Insérez l'employé
       const insertQuery = `
         INSERT INTO employees (
-          first_name, last_name, email, department_id, position_id, salary, contract_type, poste
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          first_name, last_name, email, department_id, position_id, salary, contract_type
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
       `;
       const values = [
@@ -164,7 +251,6 @@ export async function insertEmployee(data) {
         positionId,
         data.salary,
         data.contrat,
-        data.position
       ];
   
       const result = await pool.query(insertQuery, values);

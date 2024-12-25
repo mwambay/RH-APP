@@ -31,10 +31,16 @@ export const api = {
   },
 
   deleteEmploye : async (parameter : object): Promise<BackendResponse> => {
-    console.log("hhh", parameter);
+    //console.log("hhh", parameter);
     const response = axios.post(`${API_URL}/employees/delete`, parameter);
     return response;
-  }
+  },
+
+  updateEmployee : async (parameter : object): Promise<BackendResponse> => {
+    console.log("update", parameter);
+    const response = axios.post(`${API_URL}/employees/update`, parameter);
+    return response;
+  } 
 
 };
 

@@ -24,12 +24,11 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
     fetchDepartments();
   }, []);
 
-  const handleSubmit  = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("kkkks")
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    
+
     const data: Partial<Employee> = {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
@@ -38,17 +37,24 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
       department: formData.get('department') as string,
       contrat: formData.get('contrat') as string,
       salary: Number(formData.get('salary')),
-      
-      
     };
-    //onSubmit(data);
 
-    //await api.addEmployee(data);
     try {
-      api.addEmployee(data);
+      if (employee) {
+        // Si un employé est fourni, mettre à jour l'employé existant
+        await api.updateEmployee({data : data ,  id : employee.id});
+      } else {
+        // Ajouter un nouvel employé si aucun employé n'est fourni
+        await api.addEmployee(data);
+      }
       onSubmit(data);
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'employé:', error);
+      console.error(
+        employee
+          ? 'Erreur lors de la mise à jour de l\'employé:'
+          : 'Erreur lors de l\'ajout de l\'employé:',
+        error
+      );
     }
   };
 
@@ -60,7 +66,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
           <input
             type="text"
             name="firstName"
-            defaultValue={employee?.firstName}
+            defaultValue={employee?.nom || ''}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
           />
@@ -70,7 +76,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
           <input
             type="text"
             name="lastName"
-            defaultValue={employee?.lastName}
+            defaultValue={employee?.lastName || ''}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
           />
@@ -82,7 +88,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
         <input
           type="email"
           name="email"
-          defaultValue={employee?.email}
+          defaultValue={employee?.email || ''}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         />
@@ -92,25 +98,24 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
         <label className="block text-sm font-medium text-gray-700">Contrat</label>
         <select
           name="contrat"
-          defaultValue={employee?.contrat}
+          defaultValue={employee?.contrat || ''}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         >
-            <option value="">Sélectionner le type de contrat</option>
-            <option value="CDI">CDI</option>
-            <option value="CDD">CDD</option>
-            <option value="Freelance">Freelance</option>
-            <option value="Stage">Stage</option>
+          <option value="">Sélectionner le type de contrat</option>
+          <option value="CDI">CDI</option>
+          <option value="CDD">CDD</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Stage">Stage</option>
         </select>
       </div>
-
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Poste</label>
         <input
           type="text"
           name="position"
-          defaultValue={employee?.position}
+          defaultValue={employee?.poste || ''}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         />
@@ -120,7 +125,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
         <label className="block text-sm font-medium text-gray-700">Département</label>
         <select
           name="department"
-          defaultValue={employee?.department}
+          defaultValue={employee?.department || ''}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         >
@@ -138,7 +143,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeF
         <input
           type="number"
           name="salary"
-          defaultValue={employee?.salary}
+          defaultValue={employee?.salaire || ''}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           required
         />
