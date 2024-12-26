@@ -40,7 +40,12 @@ export const api = {
     //console.log("update", parameter);
     const response = axios.post(`${API_URL}/employees/update`, parameter);
     return response;
-  } 
+  } ,
+
+  getPresences: async (): Promise<BackendResponse> => {
+    const response = await axios.get(`${API_URL}/presences/get`);
+    return response.data;
+  }
 
 };
 

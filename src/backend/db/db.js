@@ -1,5 +1,31 @@
 import  pool from '../db/config.js';
 
+
+
+export async function getPresences() {
+  const presencesQuery = `
+    SELECT 
+      presences.id,
+      employees.first_name || ' ' || employees.last_name AS employee,
+      presences.arrival_time,
+      presences.departure_time,
+      presences.status
+    FROM 
+      presences
+    INNER JOIN 
+      employees ON presences.employee_id = employees.id
+  `;
+  try {
+    const result = await pool.query(presencesQuery);
+    return result.rows;
+  } catch (err) {
+    console.error('Erreur lors de la récupération des présences:', err.message);
+    throw new Error('Erreur lors de la récupération des présences.');
+  }
+}
+
+getPresences()
+
 export async function totalEmploye() {
   const totalEmployeQuery = `
     SELECT COUNT(*) FROM employees

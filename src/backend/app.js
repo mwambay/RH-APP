@@ -14,6 +14,6 @@ app.use(express.json());
 app.use('/dashboard', dashboardRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/departments', departmentRoutes);
-app.use('/presence', presenceRoutes);
+app.use('/presences', presenceRoutes);
 
 export default app;

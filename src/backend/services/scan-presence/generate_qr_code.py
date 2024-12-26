@@ -46,12 +46,12 @@ def generate_qr_codes(employees):
 
         # Créer un contenu pour le QR code
         qr_content = {
-            "id": emp_id,
-            "first_name": first_name,
-            "last_name": last_name,
-            "email": email,
-            "department_id": department_id,
-            "position_id": position_id
+            'id': emp_id,
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'department_id': department_id,
+            'position_id': position_id
         }
 
         # Générer le QR code

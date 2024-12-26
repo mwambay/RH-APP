@@ -1,7 +1,10 @@
 import cv2
 from pyzbar.pyzbar import decode
 import requests
+import time
 import json
+from scan import gerer_scan
+import ast
 
 # URL du serveur principal pour envoyer les données
 SERVER_URL = "http://localhost:3000/presence/scan"
@@ -21,8 +24,20 @@ def scan_qr_code():
         codes = decode(frame)
         for code in codes:
             data = code.data.decode('utf-8')
-            print(f"QR Code détecté : {data}")
+            print(f"QR Code détecté")
 
+            try:
+                # Convertir la chaîne de caractères en dictionnaire
+                donnees = ast.literal_eval(data)
+                gerer_scan(donnees['id'])
+                time.sleep(1)
+                #send_to_server(donnees)
+            except :
+                print("Erreur de décodage")
+
+
+            #gerer_scan(int(data[1]))
+            continue
             # Envoyer les données au serveur
             send_to_server(data)
 
