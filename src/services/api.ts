@@ -45,7 +45,11 @@ export const api = {
   getPresences: async (): Promise<BackendResponse> => {
     const response = await axios.get(`${API_URL}/presences/get`);
     return response.data;
-  }
+  },
+  getCongeInfo : async (): Promise<any[]> => {
+    const response = await axios.get(`${API_URL}/conge/info`);
+    return response.data;
+  },
 
 };
 
