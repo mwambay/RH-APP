@@ -1,39 +1,58 @@
-import React from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import PageHeader from '../components/common/PageHeader';
 import DataTable from '../components/common/DataTable';
 import StatusBadge from '../components/common/StatusBadge';
 
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import {api} from '../services/api';
+
+type StatusType = 'warning' | 'success' | 'error';
+
+interface Leave {
+  full_name: string;
+  leave_type: string;
+  start_date: string;
+  end_date: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export default function Leaves() {
-  const leaves = [
-    {
-      id: '1',
-      employee: 'Marie Martin',
-      type: 'Congé annuel',
-      startDate: '2024-03-15',
-      endDate: '2024-03-20',
-      status: 'pending',
-    },
-    // ... autres congés
-  ];
+  const [leaves, setLeaves] = useState<Leave[]>([]);
+
+  useEffect(() => {
+    const fetchLeaves = async () => {
+      try {
+        const response = await api.getCongeInfo();
+        console.log('Données récupérées:', response.data); // Debug
+        setLeaves(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des congés:', error);
+      }
+    };
+
+    fetchLeaves();
+  }, []);
+
+  const getStatusBadge = (status: Leave['status']) => {
+    const statusMap = {
+      pending: { type: 'warning', text: 'En attente' },
+      approved: { type: 'success', text: 'Approuvé' },
+      rejected: { type: 'error', text: 'Refusé' },
+    };
+    const { type, text } = statusMap[status];
+    return <StatusBadge status={type as StatusType} text={text} />;
+  };
 
   const columns = [
-    { key: 'employee', label: 'Employé' },
-    { key: 'type', label: 'Type' },
-    { key: 'startDate', label: 'Date de début' },
-    { key: 'endDate', label: 'Date de fin' },
+    { key: 'full_name', label: 'Employé' },
+    { key: 'leave_type', label: 'Type' },
+    { key: 'start_date', label: 'Date de début' },
+    { key: 'end_date', label: 'Date de fin' },
     {
       key: 'status',
       label: 'Statut',
-      render: (status: string) => {
-        const statusMap = {
-          pending: { type: 'warning', text: 'En attente' },
-          approved: { type: 'success', text: 'Approuvé' },
-          rejected: { type: 'error', text: 'Refusé' },
-        };
-        const { type, text } = statusMap[status as keyof typeof statusMap];
-        return <StatusBadge status={type as any} text={text} />;
-      },
+      render: (status: Leave['status']) => getStatusBadge(status),
     },
   ];
 

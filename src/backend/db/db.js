@@ -259,5 +259,37 @@ export async function insertEmployee(data) {
   }
 
   export async function approuverDemandeConge(){
+
+  }
+
+  export async function conges() {
+    const congesQuery = `
+      SELECT 
+    e.first_name || ' ' || e.last_name AS full_name, -- Concatène le prénom et le nom
+    lr.leave_type,
+    lr.start_date,
+    lr.end_date,
+    lr.status
+FROM 
+    leave_requests lr
+JOIN 
+    employees e 
+ON 
+    lr.employee_id = e.id;
+    `;
+
+    try {
+      const result = await pool.query(congesQuery);
+      
+      if (!result.rows || result.rows.length === 0) {
+        console.log('Aucun congé trouvé');
+        return []; // Retourner un tableau vide si aucune donnée n'est trouvée
+      }
+
+      return result.rows;  // Retourner directement les résultats sous forme de tableau d'objets
+    } catch (err) {
+      console.error("Erreur lors de la récupération des congés:", err.message);
+      throw new Error('Erreur lors de la récupération des congés.'); // Lancer une erreur générique à remonter
+    }
     
   }
