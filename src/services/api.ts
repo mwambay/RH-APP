@@ -40,10 +40,10 @@ export const api = {
     return response;
   },
   
-  getCongeInfo: async (): Promise<BackendResponse> => {
+  getCongeInfo : async (): Promise<any[]> => {
     const response = await axios.get(`${API_URL}/conge/info`);
     return response.data;
-  }
+  },
 
 };
 

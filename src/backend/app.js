@@ -3,6 +3,7 @@ import cors from 'cors';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
+import congesRoutes from './routes/congesRoute.js';
 
 const app = express();
 
@@ -13,5 +14,8 @@ app.use(express.json());
 app.use('/dashboard', dashboardRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/departments', departmentRoutes);
+
+app.use('/conge', congesRoutes);
+
 
 export default app;

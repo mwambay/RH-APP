@@ -3,6 +3,7 @@ import { getCongeInfo } from '../controllers/congesController.js';
 
 const router = express.Router();
 
-router.get('/', getCongeInfo);
+// Utilisation de la méthode GET
+router.get('/info', getCongeInfo);
 
 export default router;

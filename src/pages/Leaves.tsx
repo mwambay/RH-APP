@@ -1,11 +1,8 @@
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../components/common/PageHeader';
 import DataTable from '../components/common/DataTable';
 import StatusBadge from '../components/common/StatusBadge';
-
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import {api} from '../services/api';
+import { api } from '../services/api';
 
 type StatusType = 'warning' | 'success' | 'error';
 
@@ -23,9 +20,9 @@ export default function Leaves() {
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
-        const response = await api.getCongeInfo();
-        console.log('Données récupérées:', response.data); // Debug
-        setLeaves(Array.isArray(response.data) ? response.data : []);
+        const data = await api.getCongeInfo();
+        console.log('Données des congés récupérées:', data); // Debug
+        setLeaves(data);
       } catch (error) {
         console.error('Erreur lors de la récupération des congés:', error);
       }
@@ -35,14 +32,15 @@ export default function Leaves() {
   }, []);
 
   const getStatusBadge = (status: Leave['status']) => {
-    const statusMap = {
-      pending: { type: 'warning', text: 'En attente' },
-      approved: { type: 'success', text: 'Approuvé' },
-      rejected: { type: 'error', text: 'Refusé' },
+      const statusMap = {
+        pending: { type: 'warning', text: 'En attente' },
+        approved: { type: 'success', text: 'Approuvé' },
+        rejected: { type: 'error', text: 'Refusé' },
+      };
+      const normalizedStatus = status.toLowerCase() as keyof typeof statusMap;
+      const { type, text } = statusMap[normalizedStatus];
+      return <StatusBadge status={type as StatusType} text={text} />;
     };
-    const { type, text } = statusMap[status];
-    return <StatusBadge status={type as StatusType} text={text} />;
-  };
 
   const columns = [
     { key: 'full_name', label: 'Employé' },
@@ -63,10 +61,6 @@ export default function Leaves() {
           title="Gestion des congés"
           description="Gérez les demandes de congés"
         />
-        <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <CalendarIcon className="w-4 h-4 mr-2" />
-          Nouvelle demande
-        </button>
       </div>
       <div className="mt-6">
         <DataTable columns={columns} data={leaves} />
