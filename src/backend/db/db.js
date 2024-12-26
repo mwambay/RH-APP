@@ -249,4 +249,15 @@ export async function insertEmployee(data) {
       console.error('Erreur lors de l\'insertion de l\'employé :', err);
     }
   }
+
+  export async function EmployerEnConge() {
+    
+  }
   
+  export async function demandeConge() {
+    
+  }
+
+  export async function approuverDemandeConge(){
+    
+  }
