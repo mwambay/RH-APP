@@ -1,14 +1,4 @@
-import pkg from 'pg';
-const { Pool } = pkg;
-
-// Configurer les paramètres de connexion
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'RH-DB',
-  password: 'root',
-  port: 5432, // Port par défaut de PostgreSQL
-});
+import  pool from '../db/config.js';
 
 export async function totalEmploye() {
   const totalEmployeQuery = `
@@ -260,6 +250,3 @@ export async function insertEmployee(data) {
     }
   }
   
-
-// Exporter la connexion
-export default pool;

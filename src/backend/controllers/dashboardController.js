@@ -6,7 +6,7 @@ export const getDashboardInfo = async (req, res) => {
     const dashboard = {
       present: total,
       taux: total / 100,
-      conges: total * 9,
+      conges: total * 2,
       employe: total,
     };
     res.json(dashboard);

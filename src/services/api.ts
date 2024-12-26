@@ -37,7 +37,7 @@ export const api = {
   },
 
   updateEmployee : async (parameter : object): Promise<BackendResponse> => {
-    console.log("update", parameter);
+    //console.log("update", parameter);
     const response = axios.post(`${API_URL}/employees/update`, parameter);
     return response;
   } 
