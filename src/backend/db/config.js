@@ -5,8 +5,8 @@ const { Pool } = pkg;
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'RH-DB',
-  password: 'root',
+  database: 'hr',
+  password: 'Cadet1122',
   port: 5432, // Port par défaut de PostgreSQL
 });
 
