@@ -45,6 +45,11 @@ export const api = {
     return response.data;
   },
 
+  getPayInfo: async (): Promise<any[]> =>{
+    const response= await axios.get(`${API_URL}/pay/info`);
+    return response.data;
+  },
+
 };
 
 

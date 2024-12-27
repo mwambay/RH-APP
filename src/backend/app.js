@@ -4,6 +4,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
 import congesRoutes from './routes/congesRoute.js';
+import paieRoute from './routes/paieRoute.js';
 
 const app = express();
 
@@ -16,6 +17,6 @@ app.use('/employees', employeeRoutes);
 app.use('/departments', departmentRoutes);
 
 app.use('/conge', congesRoutes);
-
+app.use('/pay',paieRoute);
 
 export default app;

@@ -293,3 +293,40 @@ ON
     }
     
   }
+
+  export async function pay() {
+    const payQuery = `
+      SELECT 
+        e.first_name || ' ' || e.last_name AS employee_name, 
+        sh.effective_date AS pay_period, 
+        sh.salary AS base_salary, 
+        COALESCE(SUM(eb.benefit_amount), 0) AS total_benefit, 
+        (sh.salary + COALESCE(SUM(eb.benefit_amount), 0)) AS total_pay 
+      FROM 
+        employees e
+      JOIN 
+        salary_history sh 
+      ON 
+        e.id = sh.employee_id
+      LEFT JOIN 
+        employee_benefits eb 
+      ON 
+        e.id = eb.employee_id AND eb.periode = sh.effective_date 
+      GROUP BY 
+        e.id, e.first_name, e.last_name, sh.effective_date, sh.salary
+      ORDER BY 
+        sh.effective_date DESC, employee_name
+    `;
+
+    try {
+      const result = await pool.query(payQuery);
+      if (!result.rows || result.rows.length === 0) {
+        console.log('Aucune paie trouvée');
+        return []; 
+      }
+      return result.rows; 
+    } catch (err) {
+      console.error("Erreur lors de la récupération des paies:", err.message);
+      throw new Error('Erreur lors de la récupération des paies.');
+    }
+  }

@@ -3,6 +3,7 @@ import PageHeader from '../components/common/PageHeader';
 import DataTable from '../components/common/DataTable';
 import StatusBadge from '../components/common/StatusBadge';
 import { api } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 type StatusType = 'warning' | 'success' | 'error';
 
@@ -53,18 +54,34 @@ export default function Leaves() {
       render: (status: Leave['status']) => getStatusBadge(status),
     },
   ];
+const navigate = useNavigate();
 
-  return (
-    <div>
-      <div className="flex justify-between items-center">
-        <PageHeader
-          title="Gestion des congés"
-          description="Gérez les demandes de congés"
-        />
-      </div>
-      <div className="mt-6">
-        <DataTable columns={columns} data={leaves} />
-      </div>
+const handleNewRequest = () => {
+  navigate('/new-leave-request');
+};
+ return (
+  <div>
+    <div className="flex justify-between items-center">
+      <PageHeader
+        title="Gestion des congés"
+        description="Gérez les demandes de congés"
+      />
+      <button
+        onClick={handleNewRequest}
+        className="btn btn-primary"
+      >
+        Nouvelle Demande
+      </button>
     </div>
+    <div className="mt-6">
+      <DataTable columns={columns} data={leaves} />
+    </div>
+  </div>
   );
 }
+
+
+
+
+
+
