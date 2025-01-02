@@ -45,6 +45,20 @@ export const api = {
     return response.data;
   },
 
+  postDemandeConge : async (parameter : object): Promise<BackendResponse> => {
+    const response = await axios.post(`${API_URL}/conge/demande`, parameter);
+    return response.data;
+  },
+
+  putApprouverDemandeConge : async (parameter : object): Promise<BackendResponse> => {
+    const response = await axios.put(`${API_URL}/conge/approuver`, parameter);
+    return response.data;
+  },
+
+  postUpdateConge : async (parameter : object): Promise<BackendResponse> => {
+    const response = await axios.post(`${API_URL}/conge/update`, parameter);
+    return response.data;
+  },
   getPayInfo: async (): Promise<any[]> =>{
     const response= await axios.get(`${API_URL}/pay/info`);
     return response.data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Leave } from '../../types';
 import { api } from '../../services/api';
 
@@ -9,20 +9,6 @@ interface LeaveFormProps {
 }
 
 export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps) {
-    const [types, setTypes] = useState([]);
-
-    useEffect(() => {
-        const fetchTypes = async () => {
-            try {
-                const response = await api.getLeaveTypes();
-                setTypes(response.data);
-            } catch (error) {
-                console.error('Erreur lors de la récupération des types de congé:', error);
-            }
-        };
-
-        fetchTypes();
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,23 +16,21 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
         const formData = new FormData(form);
 
         const data: Partial<Leave> = {
-            firstName: formData.get('firstName') as string,
-            lastName: formData.get('lastName') as string,
-            email: formData.get('email') as string,
-            type: formData.get('type') as string,
-            dateStart: formData.get('dateStart') as string,
-            dateEnd: formData.get('dateEnd') as string,
-            statut: formData.get('statut') as string,
-            comment: formData.get('comment') as string,
+            employeeId: formData.get('email') as string,
+            type: formData.get('type') as 'vacation' | 'sick' | 'other',
+            startDate: formData.get('dateStart') as string,
+            endDate: formData.get('dateEnd') as string,
+            status: formData.get('statut') as 'pending' | 'approved' | 'rejected',
         };
 
         try {
             if (leave) {
                 // Si une demande de congé est fournie, mettre à jour la demande existante
-                await api.updateLeave({ data: data, id: leave.id });
+                await api.postUpdateConge({ id: leave.id, data });
+                
             } else {
                 // Ajouter une nouvelle demande de congé si aucune demande n'est fournie
-                await api.addLeave(data);
+                await api.postDemandeConge(data);
             }
             onSubmit(data);
         } catch (error) {
@@ -61,35 +45,12 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Prénom</label>
-                    <input
-                        type="text"
-                        name="firstName"
-                        defaultValue={leave?.firstName || ''}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Nom</label>
-                    <input
-                        type="text"
-                        name="lastName"
-                        defaultValue={leave?.lastName || ''}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        required
-                    />
-                </div>
-            </div>
-
             <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>
                 <input
                     type="email"
                     name="email"
-                    defaultValue={leave?.email || ''}
+                    defaultValue={leave?.employeeId || ''}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
                 />
@@ -104,11 +65,10 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
                     required
                 >
                     <option value="">Sélectionner le type de congé</option>
-                    {types.map((type) => (
-                        <option key={type.id} value={type.nom}>
-                            {type.nom}
-                        </option>
-                    ))}
+                    <option value="sick">Sick</option>
+                    <option value="vacation">Vacation</option>
+                    <option value="marriage">Marriage</option>
+                    <option value="other">Other</option>
                 </select>
             </div>
 
@@ -117,7 +77,7 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
                 <input
                     type="date"
                     name="dateStart"
-                    defaultValue={leave?.dateStart || ''}
+                    defaultValue={leave?.startDate || ''}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
                 />
@@ -128,7 +88,7 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
                 <input
                     type="date"
                     name="dateEnd"
-                    defaultValue={leave?.dateEnd || ''}
+                    defaultValue={leave?.endDate || ''}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
                 />
@@ -138,7 +98,7 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
                 <label className="block text-sm font-medium text-gray-700">Statut</label>
                 <select
                     name="statut"
-                    defaultValue={leave?.statut || ''}
+                    defaultValue={leave?.status || ''}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
                 >
@@ -147,15 +107,6 @@ export default function LeaveForm({ leave, onSubmit, onCancel }: LeaveFormProps)
                     <option value="Approuvé">Approuvé</option>
                     <option value="Rejeté">Rejeté</option>
                 </select>
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Commentaire</label>
-                <textarea
-                    name="comment"
-                    defaultValue={leave?.comment || ''}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
             </div>
 
             <div className="flex justify-end space-x-3 mt-6">

@@ -10,14 +10,6 @@ import Modal from '../components/common/Modal';
 
 type StatusType = 'warning' | 'success' | 'error';
 
-interface LocalLeave {
-  full_name: string;
-  leave_type: string;
-  start_date: string;
-  end_date: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
 export default function Leaves() {
   const [leaves, setLeaves] = useState<LocalLeave[]>([]);
 
@@ -85,11 +77,9 @@ const handleNewRequest = (data:Partial<LocalLeave>) => {
       onClose={() => setIsAddModalOpen(false)}
       title="Nouvelle demande de congé">  
       <LeaveForm onCancel={() => setIsAddModalOpen(false)} 
-        onSubmit={async (leave: LocalLeave) => {handleNewRequest}}/>
+        onSubmit={(leave: Partial<Leave>) => handleNewRequest(leave)}/>
       </Modal>
-  </div>
-
-  
+  </div>  
   );
 }
 
